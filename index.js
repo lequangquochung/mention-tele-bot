@@ -1,72 +1,52 @@
-require('dotenv').config()
+
 const express = require('express')
-const axios = require('axios')
-const bodyParser = require('body-parser')
-const {html: format} = require('telegram-format');
-// const {markdownv2: format} = require('telegram-format');
+const expressApp = express()
+const axios = require("axios");
+expressApp.use(express.static('static'))
+expressApp.use(express.json());
+require('dotenv').config();
 
-
-const { TOKEN, SERVER_URL } = process.env
+const { TOKEN } = process.env
 const TELEGRAM_API = `https://api.telegram.org/bot${TOKEN}`
-const URI = `/webhook/${TOKEN}`
-const WEBHOOK_URL = SERVER_URL + URI
 
-const app = express()
-app.use(bodyParser.json())
 
-const init = async () => {
-    const res = await axios.get(`${TELEGRAM_API}/setWebhook?url=${WEBHOOK_URL}`)
-    console.log(res.data)
-}
+const { Telegraf } = require('telegraf');
+const telegrafGetChatMembers = require('telegraf-getchatmembers')
 
-app.post(URI, async (req, res) => {
-    console.log(req.body.message)
+const bot = new Telegraf(process.env.TOKEN);
+ 
+bot.use(telegrafGetChatMembers)
 
-    
+bot.command('all', async (ctx) => {
+    let txt = `[Bi](tg://user?id=1713158826) [Ty](tg://user?id=1959826105) [Rot](tg://user?id=1730449615) [Chuong](tg://user?id=5376812878) [Thim](tg://user?id=1756511821) [Long](tg://user?id=5035545397)`
+    await axios.post(`${TELEGRAM_API}/sendMessage`, {
+        chat_id: ctx.chat.id,
+        parse_mode: "MarkdownV2",
+        text: txt
+    })
+});
 
-    const chatId= req.body.message?.chat.id
-    const text = req.body.message?.text
-    const isMention = req.body.message?.entities?.length
-    
+bot.command('quy', async (ctx) => {
+    let txt = `Đóng quỹ đi mấy thằng lồn [Bi](tg://user?id=1713158826) [Ty](tg://user?id=1959826105) [Rot](tg://user?id=1730449615) [Chuong](tg://user?id=5376812878)`
+    await axios.post(`${TELEGRAM_API}/sendMessage`, {
+        chat_id: ctx.chat.id,
+        parse_mode: "MarkdownV2",
+        text: txt
+    })
+});
 
-    if(isMention && text.startsWith('@pgd_mention_bot')){
-      if(text === "@pgd_mention_bot " +"ty") {
-        
-        await axios.post(`${TELEGRAM_API}/sendMessage`, {
-          chat_id: chatId,
-          text: "la mot nguoi tot"
-        })
-      }
-      else if(text === "@pgd_mention_bot " + "thim"){
-        await axios.post(`${TELEGRAM_API}/sendMessage`, {
-          chat_id: chatId,
-          text: "la mot nguoi xau"
-        })
-      }
-      else if(text === "@pgd_mention_bot " + "long"){
-        await axios.post(`${TELEGRAM_API}/sendMessage`, {
-          chat_id: chatId,
-      
-          text: "@Long la mot thang map"
-        })
-      } 
-       else {
-         let txt = "[Snow min](tg://user?id=5441762434) [Pi](tg://user?id=1713158826) "
-        await axios.post(`${TELEGRAM_API}/sendMessage`, {
-          chat_id: chatId,
-          parse_mode: "MarkdownV2",
-          text: [Everyone] + txt
-        })
-      }
-     
-    }
-    // console.log('isMention',isMention);
-    // (tg://user?id=1713158826) 
-    
-    return res.send()
-})
+bot.command('quydone', async (ctx) => {
+    let txt = `Quỹ tuần ni đủ rồi háy [Bi](tg://user?id=1713158826) [Ty](tg://user?id=1959826105) [Rot](tg://user?id=1730449615) [Chuong](tg://user?id=5376812878)`
+    await axios.post(`${TELEGRAM_API}/sendMessage`, {
+        chat_id: ctx.chat.id,
+        parse_mode: "MarkdownV2",
+        text: txt
+    })
+});
 
-app.listen(process.env.PORT || 5000, async () => {
-    console.log('🚀 app running on port', process.env.PORT || 5000)
-    await init()
-})
+bot.command('help', async (ctx) => {
+    const message = "/quy: Nhắc nộp quỹ \n\/quydone: Thông báo nộp quỹ đầy đủ\n\/all: Tag all"
+    bot.telegram.sendMessage(ctx.chat.id, message, {})
+});
+
+bot.launch()
