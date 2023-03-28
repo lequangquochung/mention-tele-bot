@@ -46,7 +46,7 @@ bot.command('quy', async (ctx) => {
 });
 
 bot.command('quydone', async (ctx) => {
-    let txt = `Quỹ tuần ni đủ rồi háy [Bi](tg://user?id=1713158826) [Ty](tg://user?id=1959826105) [Rot](tg://user?id=1730449615) [Chuong](tg://user?id=5376812878)`
+    let txt = `lequydone [Bi](tg://user?id=1713158826) [Ty](tg://user?id=1959826105) [Rot](tg://user?id=1730449615) [Chuong](tg://user?id=5376812878)`
     await axios.post(`${TELEGRAM_API}/sendMessage`, {
         chat_id: ctx.chat.id,
         parse_mode: "MarkdownV2",
@@ -69,10 +69,28 @@ bot.command('help', async (ctx) => {
 // # *  *  *  *  *  command to be executed
 
 
-// cron.schedule('0 9 * * 1', () => {
-//     // sendMessage();
-//     console.log("cronjob run");
-//   });
+cron.schedule('0 9 * * mon', () => {
+    // sendMessage();
+    // console.log("cronjob run");
+
+    bot.command('quy', async (ctx) => {
+        try {
+         let txt = `Đóng quỹ đi [Bi](tg://user?id=1713158826) [Ty](tg://user?id=1959826105) [Rot](tg://user?id=1730449615) [Chuong](tg://user?id=5376812878)`
+         await axios.post(`${TELEGRAM_API}/sendMessage`, {
+             chat_id: ctx.chat.id,
+             parse_mode: "MarkdownV2",
+             text: txt
+         })
+     
+         // send photo
+         let filePath  = 'momo.jpg';
+         const photo = fs.createReadStream(filePath);
+         await ctx.replyWithPhoto({ source: photo }, { chat_id: ctx.chat.id });
+        } catch (error) {
+         console.error('Error sending:', error);
+        }
+     });
+});
 
 bot.launch()
 
