@@ -5,7 +5,7 @@ const axios = require("axios");
 expressApp.use(express.static('static'))
 expressApp.use(express.json());
 require('dotenv').config();
-// const cron = require('node-cron');
+const cron = require('node-cron');
 const { TOKEN } = process.env
 const TELEGRAM_API = `https://api.telegram.org/bot${TOKEN}`
 const { Telegraf } = require('telegraf');
