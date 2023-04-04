@@ -13,12 +13,14 @@ const telegrafGetChatMembers = require('telegraf-getchatmembers')
 const bot = new Telegraf(process.env.TOKEN);
  
 const fs = require('fs');
+var chatIdGr;
 
 
 bot.use(telegrafGetChatMembers)
 
 bot.command('all', async (ctx) => {
     console.log(ctx);
+    chatIdGr = ctx.chat.id
     let txt = `[Bi](tg://user?id=1713158826) [Ty](tg://user?id=1959826105) [Rot](tg://user?id=1730449615) [Chuong](tg://user?id=5376812878) [Thim](tg://user?id=1756511821) [Long](tg://user?id=5035545397)`
     await axios.post(`${TELEGRAM_API}/sendMessage`, {
         chat_id: ctx.chat.id,
@@ -73,27 +75,25 @@ cron.schedule('0 9 * * mon', () => {
     // sendMessage();
     // console.log("cronjob run");
 
-    bot.command('quy', async (ctx) => {
-        try {
-         let txt = `Đóng quỹ đi [Bi](tg://user?id=1713158826) [Ty](tg://user?id=1959826105) [Rot](tg://user?id=1730449615) [Chuong](tg://user?id=5376812878)`
-         await axios.post(`${TELEGRAM_API}/sendMessage`, {
-             chat_id: ctx.chat.id,
-             parse_mode: "MarkdownV2",
-             text: txt
-         })
-     
-         // send photo
-         let filePath  = 'momo.jpg';
-         const photo = fs.createReadStream(filePath);
-         await ctx.replyWithPhoto({ source: photo }, { chat_id: ctx.chat.id });
-        } catch (error) {
-         console.error('Error sending:', error);
-        }
-     });
+    try {
+        let txt = `Đóng quỹ đi [Bi](tg://user?id=1713158826) [Ty](tg://user?id=1959826105) [Rot](tg://user?id=1730449615) [Chuong](tg://user?id=5376812878)`
+        axios.post(`${TELEGRAM_API}/sendMessage`, {
+            chat_id: chatIdGr,
+            parse_mode: "MarkdownV2",
+            text: txt
+        })
+    
+        // send photo
+        let filePath  = 'momo.jpg';
+        const photo = fs.createReadStream(filePath);
+        ctx.replyWithPhoto({ source: photo }, { chat_id: chatIdGr });
+       } catch (error) {
+        console.error('Error sending:', error);
+       }
+
+    // bot.command('quy', async (ctx) => {
+       
+    //  });
 });
 
-bot.launch()
-
-function sendMessageToGroup(member) {
-    member.message.from.id
-}
+bot.launch()    
